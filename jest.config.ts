@@ -12,6 +12,7 @@ const config: Config = {
   clearMocks: true,
   // Added to ensure "@testing-library/jest-dom" is available in all test files
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+  testMatch: ["**/?(*.)+(test).[tj]s?(x)"],
 };
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
