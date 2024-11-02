@@ -1,4 +1,4 @@
-import { render, waitFor, screen } from "@testing-library/react";
+import { render, waitFor, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PersonCard from "../PersonCard";
 
@@ -32,53 +32,97 @@ const personData = {
   url: "https://swapi.dev/api/people/1/",
 };
 
-describe("PersonCard Component", () => {
-  it("should render all person data", async () => {
-    render(<PersonCard person={personData} />);
+const homeworldData = {
+  name: "Tatooine",
+  rotation_period: "23",
+  orbital_period: "304",
+  diameter: "10465",
+  climate: "arid",
+  gravity: "1 standard",
+  terrain: "desert",
+  surface_water: "1",
+  population: "200000",
+  url: "https://swapi.dev/api/planets/1/",
+};
 
-    // Wait for the person data to be rendered & homeworld data to be fetched
+global.fetch = jest.fn(
+  () =>
+    Promise.resolve({
+      json: () => Promise.resolve(homeworldData),
+      headers: new Headers(),
+      ok: true,
+      redirected: false,
+      status: 200,
+      statusText: "OK",
+      type: "basic",
+      url: "",
+    }) as Promise<Response>
+);
+
+describe("PersonCard Component", () => {
+  beforeEach(() => {
+    (fetch as jest.Mock).mockClear();
+  });
+
+  it("should render all person data", async () => {
+    await act(async () => {
+      render(<PersonCard person={personData} />);
+    });
+
     await waitFor(() => {
       expect(screen.getByText(/Luke Skywalker/i)).toBeInTheDocument();
     });
 
-    // Expect name, gender, and homeworld to be rendered
     expect(
       screen.getByRole("heading", { name: /Luke Skywalker/i })
     ).toBeInTheDocument();
-    expect(screen.getByTestId("person-gender")).toHaveTextContent("male");
+
+    expect(screen.getByTestId("person-gender")).toHaveTextContent(
+      "Gender: Male"
+    );
+
     expect(screen.getByTestId("person-homeworld")).toHaveTextContent(
-      "Tatooine"
+      "Homeworld: Tatooine"
     );
   });
 
   it("should render loading spinner when homeworld data is being fetched", async () => {
-    render(<PersonCard person={personData} />);
+    jest.spyOn(global, "fetch").mockImplementationOnce(
+      () =>
+        new Promise(() => {
+          // Never resolves for testing load state
+        })
+    );
 
-    // Wait for loading spinner to be in the document
-    const loadingSpinner = await screen.findByTestId("loading-skeleton");
-    expect(loadingSpinner).toBeInTheDocument();
+    await act(async () => {
+      render(<PersonCard person={personData} />);
+    });
+
+    expect(screen.getByTestId("loading-skeleton")).toBeInTheDocument();
   });
 
   it("should render error message when homeworld data fetch fails", async () => {
     jest
       .spyOn(global, "fetch")
-      .mockImplementation(() =>
+      .mockImplementationOnce(() =>
         Promise.reject(new Error("Failed to fetch data"))
       );
 
-    render(<PersonCard person={personData} />);
+    await act(async () => {
+      render(<PersonCard person={personData} />);
+    });
 
-    // Wait for the error message to appear
-    const errorMessage = await screen.findByText(
-      /Failed to fetch homeworld data/i
-    );
+    const errorMessage = await screen.findByTestId("error-message");
     expect(errorMessage).toBeInTheDocument();
+    expect(errorMessage).toHaveTextContent("Failed to fetch homeworld data");
   });
 
-  it("should have accessible role attributes for headings", () => {
-    render(<PersonCard person={personData} />);
+  it("should have accessible role attributes for headings", async () => {
+    await act(async () => {
+      render(<PersonCard person={personData} />);
+    });
 
-    const headingElement = screen.getByRole("heading", {
+    const headingElement = await screen.findByRole("heading", {
       name: /Luke Skywalker/i,
     });
     expect(headingElement).toBeInTheDocument();
