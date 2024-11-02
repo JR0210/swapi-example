@@ -1,3 +1,11 @@
+// SWAPI response objects
+export interface IPeopleResponse {
+  count: number;
+  next: string;
+  previous: string;
+  results: IPerson[];
+}
+
 // Object types based on SWAPI response data
 export interface IPerson {
   name: string;
