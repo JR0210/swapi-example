@@ -10,6 +10,7 @@ export default function PersonCard({ person }: { person: IPerson }) {
   const [homeworld, setHomeworld] = useState<IPlanet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const personId = person.url.split("/").slice(-2)[0];
 
   useEffect(() => {
     async function fetchHomeworld() {
@@ -43,7 +44,7 @@ export default function PersonCard({ person }: { person: IPerson }) {
   }
 
   return (
-    <Card href="#">
+    <Card href={`/people/${personId}`}>
       <h2 className="font-semibold text-lg">{person.name}</h2>
       <div className="flex flex-row justify-between">
         <p data-testid="person-gender">
