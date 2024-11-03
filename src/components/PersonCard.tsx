@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { type IPerson, type IPlanet } from "../types/global";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
