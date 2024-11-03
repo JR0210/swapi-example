@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { type IPerson, type IPlanet } from "../types/global";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 
+import { Card } from "flowbite-react";
+
 export default function PersonCard({ person }: { person: IPerson }) {
   const [homeworld, setHomeworld] = useState<IPlanet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,13 +41,14 @@ export default function PersonCard({ person }: { person: IPerson }) {
   }
 
   return (
-    <div>
-      <h2>{person.name}</h2>
-      {/* Set 1st character to uppercase */}
-      <p data-testid="person-gender">
-        Gender: {capitalizeFirstLetter(person.gender)}
-      </p>
-      {renderHomeWorld()}
-    </div>
+    <Card href="#">
+      <h2 className="font-semibold text-lg">{person.name}</h2>
+      <div className="flex flex-row justify-between">
+        <p data-testid="person-gender">
+          Gender: {capitalizeFirstLetter(person.gender)}
+        </p>
+        {renderHomeWorld()}
+      </div>
+    </Card>
   );
 }
