@@ -46,6 +46,7 @@ npm run test:e2e
 - Edit person functionality, preferably if SWAPI allowed for editing through the API or forked repo. Use optimistic updates and control users expectations/knowledge through toast notifications.
 - E2E tests, currently using playwright to run headless/faster. Little bit rusty on testing generally, especially TDD focused.
 - Favouriting functionality has a relatively major issue when opening a single person page, since the main page is SSR and the favourite status can only be calculated from local storage for now. The user can inadvertently overwrite all over favourites since it reads it as empty initially. Having this within the API would entirely negate this.
+- Improve styling/theming throughout, as well as improving any accessibility issues.
 
 ## Test Coverage
 
