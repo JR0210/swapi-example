@@ -1,16 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { type IPerson, type IPlanet } from "../types/global";
-import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
-
 import { Card } from "flowbite-react";
 
-export default function PersonCard({ person }: { person: IPerson }) {
+import { type IPerson, type IPlanet } from "../types/global";
+import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
+import extractPersonId from "@/utils/extractPersonId";
+import DeleteButton from "./DeleteButton";
+
+interface IPersonCardProps {
+  person: IPerson;
+  deleteFn?: (personId: string) => void;
+}
+
+export default function PersonCard({ person, deleteFn }: IPersonCardProps) {
   const [homeworld, setHomeworld] = useState<IPlanet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const personId = person.url.split("/").slice(-2)[0];
+  const personId = extractPersonId(person.url);
 
   useEffect(() => {
     async function fetchHomeworld() {
@@ -43,10 +50,19 @@ export default function PersonCard({ person }: { person: IPerson }) {
     }
   }
 
+  function handleDeleteClick(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    deleteFn && deleteFn(personId);
+  }
+
   return (
     <Card href={`/people/${personId}`}>
+      {deleteFn && (
+        <DeleteButton onClick={handleDeleteClick} className="w-12" />
+      )}
       <h2 className="font-semibold text-lg">{person.name}</h2>
       <div className="flex flex-row justify-between">
+        <p data-testid="person-height">Height: {person.height} cm</p>
         <p data-testid="person-gender">
           Gender: {capitalizeFirstLetter(person.gender)}
         </p>
